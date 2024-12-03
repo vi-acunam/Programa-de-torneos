@@ -1,11 +1,46 @@
-<form id="pollForm">
-  <h2>Vote for your favorite color:</h2>
-  <label><input type="radio" name="color" value="Red"> Red</label><br>
-  <label><input type="radio" name="color" value="Blue"> Blue</label><br>
-  <label><input type="radio" name="color" value="Green"> Green</label><br>
-  <button type="submit">Submit Vote</button>
-</form>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poll</title>
+</head>
+<body>
+    <h1>What is your favorite programming language?</h1>
+    <form id="pollForm">
+        <label>
+            <input type="radio" name="language" value="JavaScript"> JavaScript
+        </label><br>
+        <label>
+            <input type="radio" name="language" value="Python"> Python
+        </label><br>
+        <label>
+            <input type="radio" name="language" value="Ruby"> Ruby
+        </label><br>
+        <button type="submit">Submit</button>
+    </form>
 
-<div id="result" style="display:none;">
-  <p id="resultText"></p>
-</div>
+    <script>
+        document.getElementById('pollForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            const selectedValue = formData.get('language');
+            
+            if (selectedValue) {
+                fetch('/api/submit-poll', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ language: selectedValue })
+                }).then(response => response.json())
+                  .then(data => alert('Thanks for voting!'))
+                  .catch(error => alert('Error submitting vote.'));
+            } else {
+                alert('Please select an option.');
+            }
+        });
+    </script>
+</body>
+</html>

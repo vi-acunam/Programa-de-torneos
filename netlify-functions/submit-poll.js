@@ -1,47 +1,48 @@
-const admin = require('firebase-admin');
+// functions/submit-poll.js
+const faunadb = require('faunadb');  // FaunaDB client
 
-// Initialize Firebase Admin SDK (using environment variables for credentials)
-admin.initializeApp({
-  credential: admin.credential.applicationDefault(),
-  databaseURL: 'https://(default).firebaseio.com',
+const q = faunadb.query;
+const client = new faunadb.Client({
+    secret: 'fnAFxuQGynAAQOAcusIPMrWDT7_kUk7ZSpmivv81'  // Replace with your FaunaDB secret key
 });
 
-const db = admin.firestore();
-
 exports.handler = async (event, context) => {
-  if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      body: JSON.stringify({ message: 'Only POST requests are allowed' }),
-    };
-  }
+    if (event.httpMethod === 'POST') {
+        // Parse the incoming JSON body
+        const { language } = JSON.parse(event.body);
 
-  // Parse incoming data
-  const body = JSON.parse(event.body);
-  const { color } = body; // Get the selected color option
+        // Ensure the language value exists
+        if (!language) {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ error: 'No language selected.' })
+            };
+        }
 
-  if (!color) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ message: 'Color field is required' }),
-    };
-  }
+        try {
+            // Create a new record in FaunaDB
+            const result = await client.query(
+                q.Create(
+                    q.Collection('PollResponses'),  // Replace with your collection name
+                    { data: { language } }
+                )
+            );
 
-  // Save the response to Firestore
-  try {
-    await db.collection('poll_responses').add({
-      color: color,
-      timestamp: admin.firestore.FieldValue.serverTimestamp(),
-    });
-
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ message: 'Vote submitted successfully' }),
-    };
-  } catch (error) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ message: 'Error saving vote', error: error.message }),
-    };
-  }
+            return {
+                statusCode: 200,
+                body: JSON.stringify({ message: 'Response saved successfully!' })
+            };
+        } catch (error) {
+            console.error('Error saving to FaunaDB:', error);
+            return {
+                statusCode: 500,
+                body: JSON.stringify({ error: 'Error saving response to database.' })
+            };
+        }
+    } else {
+        return {
+            statusCode: 405,
+            body: JSON.stringify({ error: 'Method Not Allowed' })
+        };
+    }
 };
