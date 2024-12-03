@@ -1,36 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Simple Poll Website</title>
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body>
+<form id="pollForm">
+  <h2>Vote for your favorite color:</h2>
+  <label><input type="radio" name="color" value="Red"> Red</label><br>
+  <label><input type="radio" name="color" value="Blue"> Blue</label><br>
+  <label><input type="radio" name="color" value="Green"> Green</label><br>
+  <button type="submit">Submit Vote</button>
+</form>
 
-  <div class="poll-container">
-    <h1>What is your favorite color?</h1>
-    
-    <!-- Poll Form -->
-    <form id="pollForm">
-      <input type="radio" id="red" name="color" value="Red">
-      <label for="red">Red</label><br>
-      <input type="radio" id="blue" name="color" value="Blue">
-      <label for="blue">Blue</label><br>
-      <input type="radio" id="green" name="color" value="Green">
-      <label for="green">Green</label><br>
-      <input type="radio" id="yellow" name="color" value="Yellow">
-      <label for="yellow">Yellow</label><br>
-      
-      <button type="submit">Vote</button>
-    </form>
-
-    <div id="result" style="display:none;">
-      <h2>Poll Results:</h2>
-      <p id="resultText"></p>
-    </div>
-  </div>
-
-  <script src="script.js"></script>
-</body>
-</html>
+<div id="result" style="display:none;">
+  <p id="resultText"></p>
+</div>
