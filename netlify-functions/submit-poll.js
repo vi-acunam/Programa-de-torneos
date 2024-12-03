@@ -15,7 +15,7 @@ exports.handler = async (event, context) => {
                 q.Create(
                     q.Collection('PollResponses'),
                     { data: { language } }
-                );
+                )  // Remove the extra semicolon here
             );
             return {
                 statusCode: 200,
