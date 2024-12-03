@@ -3,7 +3,7 @@ const faunadb = require('faunadb');  // Assuming you're using FaunaDB for storag
 
 const q = faunadb.query;
 const client = new faunadb.Client({
-    secret: 'your-faunadb-secret'  // Use your FaunaDB secret key
+    secret: 'fnAFxuMxK0AAQnu7wBCuCucJekQwzaqWsccu_11E'  // Use your FaunaDB secret key
 });
 
 exports.handler = async (event, context) => {
