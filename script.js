@@ -1,13 +1,31 @@
-// Handle form submission
-document.getElementById('pollForm').addEventListener('submit', function(event) {
+document.getElementById('pollForm').addEventListener('submit', async function(event) {
   event.preventDefault(); // Prevent form from reloading the page
 
-  // Get the selected answer
   const formData = new FormData(event.target);
   const selectedValue = formData.get('color');
 
-  // Display results
-  const resultText = `You voted for ${selectedValue}`;
-  document.getElementById('resultText').textContent = resultText;
-  document.getElementById('result').style.display = 'block'; // Show results
+  if (!selectedValue) {
+    alert('Please select a color');
+    return;
+  }
+
+  // Send the selected value to the Netlify function
+  try {
+    const response = await fetch('/.netlify/functions/submit-poll', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ color: selectedValue }),
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      document.getElementById('resultText').textContent = `You voted for ${selectedValue}`;
+      document.getElementById('result').style.display = 'block'; // Show results
+    } else {
+      alert(`Error: ${result.message}`);
+    }
+  } catch (error) {
+    alert('Error submitting vote: ' + error);
+  }
 });
