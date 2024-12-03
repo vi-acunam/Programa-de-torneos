@@ -3,44 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Poll</title>
+    <title>Poll Voting</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        .container {
+            max-width: 500px;
+            margin: 100px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        select, button {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .error {
+            color: red;
+            font-size: 14px;
+            text-align: center;
+        }
+        .success {
+            color: green;
+            font-size: 14px;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
-    <h1>What is your favorite programming language?</h1>
-    <form id="pollForm">
-        <label>
-            <input type="radio" name="language" value="JavaScript"> JavaScript
-        </label><br>
-        <label>
-            <input type="radio" name="language" value="Python"> Python
-        </label><br>
-        <label>
-            <input type="radio" name="language" value="Ruby"> Ruby
-        </label><br>
-        <button type="submit">Submit</button>
-    </form>
+
+    <div class="container">
+        <h1>Vote for Your Favorite Option</h1>
+        <form id="pollForm">
+            <div class="form-group">
+                <label for="voteOption">Choose your vote:</label>
+                <select id="voteOption" name="voteOption" required>
+                    <option value="">Select an option</option>
+                    <option value="Option 1">Option 1</option>
+                    <option value="Option 2">Option 2</option>
+                    <option value="Option 3">Option 3</option>
+                </select>
+            </div>
+            <button type="submit">Submit Vote</button>
+            <div id="message" class="error"></div>
+        </form>
+    </div>
 
     <script>
-        document.getElementById('pollForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            
-            const formData = new FormData(event.target);
-            const selectedValue = formData.get('language');
-            
-            if (selectedValue) {
-                fetch('/api/submit-poll', {
+        const form = document.getElementById('pollForm');
+        const message = document.getElementById('message');
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault(); // Prevent default form submission
+
+            // Clear any previous messages
+            message.textContent = '';
+
+            const voteOption = document.getElementById('voteOption').value;
+
+            if (!voteOption) {
+                message.textContent = 'Please select an option before submitting your vote.';
+                message.classList.add('error');
+                return;
+            }
+
+            // Send the vote to the Netlify function
+            try {
+                const response = await fetch('/.netlify/functions/submit-poll', {
                     method: 'POST',
+                    body: JSON.stringify({ voteOption }),
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ language: selectedValue })
-                }).then(response => response.json())
-                  .then(data => alert('Thanks for voting!'))
-                  .catch(error => alert('Error submitting vote.'));
-            } else {
-                alert('Please select an option.');
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    message.textContent = 'Vote submitted successfully!';
+                    message.classList.remove('error');
+                    message.classList.add('success');
+                } else {
+                    throw new Error(result.error || 'Error submitting vote');
+                }
+            } catch (error) {
+                console.error('Error submitting vote:', error);
+                message.textContent = 'There was an error submitting your vote. Please try again later.';
+                message.classList.add('error');
             }
         });
     </script>
+
 </body>
 </html>
