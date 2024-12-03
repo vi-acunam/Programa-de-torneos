@@ -3,7 +3,7 @@ const admin = require('firebase-admin');
 // Initialize Firebase Admin SDK (using environment variables for credentials)
 admin.initializeApp({
   credential: admin.credential.applicationDefault(),
-  databaseURL: 'https://(default).firebaseio.com',
+  databaseURL: 'https://<your-database-name>.firebaseio.com',
 });
 
 const db = admin.firestore();
